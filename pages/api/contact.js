@@ -24,15 +24,18 @@ async function handler(req, res) {
         };
         let client
         // Connect to database
+        const connectionString = `mongodb+srv://${process.env.mongodb_username}:${process.env.mongodb_password}@${process.env.mongodb_cluster}.6tifb.mongodb.net/${process.env.mongodb_database}?retryWrites=true&w=majority`
+        console.log(connectionString);
         try {
-            client = await MongoClient.connect('mongodb+srv://aghnaros:G38qqHXA58eY6bs@cluster0.6tifb.mongodb.net/nextjs-blog?retryWrites=true&w=majority');
+            client = await MongoClient.connect(connectionString);
         } catch (error) {
             res.status(500).json({
-                message: 'Unable to connect to database'
+                message: 'Unable to connect to database',
+                error: error
             })
         }
 
-        const db = client.db('nextjs-blog');
+        const db = client.db(process.env.mongodb_database);
         try {
             const result = await db.collection('messages').insertOne(newMessage);
             newMessage.id = result.insertedId;
